@@ -314,7 +314,10 @@ function Get-CopilotTelemetryStatus {
 }
 
 # Initialize telemetry system
-if (-not $Script:CopilotConfig.ContainsKey('EnableTelemetry')) {
+if (-not $Script:CopilotConfig -or -not $Script:CopilotConfig.ContainsKey('EnableTelemetry')) {
+    if (-not $Script:CopilotConfig) {
+        $Script:CopilotConfig = @{}
+    }
     # Default to DISABLED - require explicit opt-in for privacy
     $Script:CopilotConfig.EnableTelemetry = $false
     $Script:CopilotConfig.SessionStart = Get-Date

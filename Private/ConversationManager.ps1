@@ -11,7 +11,11 @@ class CopilotConversation {
         $this.Context = @{}
     }
 
-    [void]AddMessage([string]$Role, [string]$Content, [hashtable]$Metadata = @{}) {
+    [void]AddMessage([string]$Role, [string]$Content) {
+        $this.AddMessage($Role, $Content, @{})
+    }
+
+    [void]AddMessage([string]$Role, [string]$Content, [hashtable]$Metadata) {
         $message = @{
             Id = [Guid]::NewGuid().ToString()
             Timestamp = Get-Date

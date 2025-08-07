@@ -47,6 +47,48 @@ jobs:
           Write-Host "📊 Summary: $warnings warnings, $info informational messages (non-blocking)"
         }
     
+    - name: Validate Module
+      shell: pwsh
+      run: |
+        Write-Host "🔍 Validating module structure and imports..."
+        
+        # Test module manifest
+        Write-Host "Testing module manifest..."
+        Test-ModuleManifest -Path ./CopilotAgent.psd1
+        
+        # Test module import
+        Write-Host "Testing module import..."
+        Import-Module ./CopilotAgent.psd1 -Force
+        
+        # Verify expected functions are exported
+        $expectedFunctions = @(
+          'Start-CopilotAgent',
+          'Invoke-CopilotChat',
+          'Get-CopilotInsights',
+          'Set-CopilotConfiguration',
+          'Export-CopilotConversation',
+          'Enable-CopilotTelemetry',
+          'Disable-CopilotTelemetry',
+          'Get-CopilotTelemetryStatus',
+          'Get-CopilotUsageReport',
+          'Export-CopilotDiagnostics',
+          'Get-CopilotDiagnostics'
+        )
+        
+        $exportedFunctions = (Get-Command -Module CopilotAgent).Name
+        Write-Host "✅ Found $($exportedFunctions.Count) exported functions"
+        
+        foreach ($function in $expectedFunctions) {
+          if ($exportedFunctions -contains $function) {
+            Write-Host "✅ $function"
+          } else {
+            Write-Error "❌ Missing function: $function"
+            exit 1
+          }
+        }
+        
+        Write-Host "✅ Module validation completed successfully"
+    
     - name: Run Pester Tests
       shell: pwsh
       run: |
