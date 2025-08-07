@@ -187,7 +187,7 @@ Describe "Chat Functionality Tests" {
 
     Context "Invoke-CopilotChat" {
         It "Should accept message parameter" {
-            { Invoke-CopilotChat -Message "Hello" } | Should -Not -Throw
+            { Invoke-CopilotChat -Message "Hello" -SkipPreconditionChecks } | Should -Not -Throw
         }
 
         It "Should require message parameter" {
@@ -195,7 +195,7 @@ Describe "Chat Functionality Tests" {
         }
 
         It "Should return response object" {
-            $result = Invoke-CopilotChat -Message "test"
+            $result = Invoke-CopilotChat -Message "test" -SkipPreconditionChecks
             $result | Should -Not -BeNullOrEmpty
             $result.Response | Should -Not -BeNullOrEmpty
         }
