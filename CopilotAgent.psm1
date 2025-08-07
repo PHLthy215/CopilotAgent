@@ -31,7 +31,7 @@ Export-ModuleMember -Function $PublicFunctions
 # Export telemetry functions from private module
 Export-ModuleMember -Function @(
     'Enable-CopilotTelemetry',
-    'Disable-CopilotTelemetry', 
+    'Disable-CopilotTelemetry',
     'Get-CopilotTelemetryStatus',
     'Get-CopilotUsageReport'
 )

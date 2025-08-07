@@ -38,7 +38,7 @@ $sourceDirs = @("Private", "Public")
 foreach ($dir in $sourceDirs) {
     $sourcePath = Join-Path $PSScriptRoot $dir
     $destPath = Join-Path $installPath $dir
-    
+
     if (Test-Path $sourcePath) {
         Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force
         Write-Host "Copied $dir directory" -ForegroundColor Green
@@ -49,11 +49,11 @@ foreach ($dir in $sourceDirs) {
 try {
     Import-Module $installPath -Force
     Write-Host "Module installed and imported successfully!" -ForegroundColor Green
-    
+
     $commands = Get-Command -Module CopilotAgent
     Write-Host "Available commands: $($commands.Count)" -ForegroundColor Cyan
     $commands.Name | ForEach-Object { Write-Host "  - $_" -ForegroundColor Gray }
-    
+
 } catch {
     Write-Error "Failed to import module: $($_.Exception.Message)"
 }

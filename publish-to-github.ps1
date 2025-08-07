@@ -2,13 +2,13 @@
 param(
     [Parameter(Mandatory)]
     [string]$GitHubUsername,
-    
+
     [Parameter()]
     [string]$RepositoryName = "CopilotAgent",
-    
+
     [Parameter()]
     [switch]$Private,
-    
+
     [Parameter()]
     [string]$Description = "PowerShell Agentic LLM using Microsoft 365 Copilot AI"
 )

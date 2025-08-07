@@ -27,10 +27,10 @@
 param(
     [Parameter()]
     [string]$InstallPath,
-    
+
     [Parameter()]
     [switch]$Force,
-    
+
     [Parameter()]
     [switch]$SkipDependencies
 )
@@ -57,7 +57,7 @@ function Test-IsAdmin {
 
 function Install-RequiredModules {
     Write-Host "📦 Installing required PowerShell modules..." -ForegroundColor Yellow
-    
+
     $requiredModules = @(
         'Microsoft.Graph.Authentication',
         'Microsoft.Graph.Applications',
@@ -66,7 +66,7 @@ function Install-RequiredModules {
         'Microsoft.Graph.Calendar',
         'Microsoft.Graph.Files'
     )
-    
+
     foreach ($module in $requiredModules) {
         Write-Host "  Installing $module..." -ForegroundColor Gray
         try {
@@ -84,22 +84,22 @@ function Install-RequiredModules {
 
 function Copy-ModuleFiles {
     param([string]$DestinationPath)
-    
+
     Write-Host "📁 Copying module files..." -ForegroundColor Yellow
-    
+
     $sourceDir = $PSScriptRoot
-    
+
     # Create destination directory
     if (-not (Test-Path $DestinationPath)) {
         New-Item -Path $DestinationPath -ItemType Directory -Force | Out-Null
     }
-    
+
     # Copy all module files
     $filesToCopy = @(
         'CopilotAgent.psd1',
         'CopilotAgent.psm1'
     )
-    
+
     foreach ($file in $filesToCopy) {
         $sourcePath = Join-Path $sourceDir $file
         if (Test-Path $sourcePath) {
@@ -107,13 +107,13 @@ function Copy-ModuleFiles {
             Write-Host "  ✓ Copied $file" -ForegroundColor Green
         }
     }
-    
+
     # Copy directories
     $dirsToCopy = @('Private', 'Public')
     foreach ($dir in $dirsToCopy) {
         $sourcePath = Join-Path $sourceDir $dir
         $destPath = Join-Path $DestinationPath $dir
-        
+
         if (Test-Path $sourcePath) {
             Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force
             Write-Host "  ✓ Copied $dir directory" -ForegroundColor Green
@@ -123,16 +123,16 @@ function Copy-ModuleFiles {
 
 function Register-Module {
     param([string]$ModulePath)
-    
+
     Write-Host "📝 Registering module..." -ForegroundColor Yellow
-    
+
     # Add to PSModulePath if not already there
     $currentPSModulePath = $env:PSModulePath -split ';'
     $moduleParentPath = Split-Path $ModulePath -Parent
-    
+
     if ($moduleParentPath -notin $currentPSModulePath) {
         $env:PSModulePath += ";$moduleParentPath"
-        
+
         # Make it permanent for current user
         $userPath = [Environment]::GetEnvironmentVariable('PSModulePath', 'User')
         if ($userPath) {
@@ -141,27 +141,27 @@ function Register-Module {
             $userPath = $moduleParentPath
         }
         [Environment]::SetEnvironmentVariable('PSModulePath', $userPath, 'User')
-        
+
         Write-Host "  Added to PSModulePath" -ForegroundColor Green
     }
 }
 
 function Test-Installation {
     Write-Host "🧪 Testing installation..." -ForegroundColor Yellow
-    
+
     try {
         Import-Module CopilotAgent -Force
-        
+
         $commands = Get-Command -Module CopilotAgent
         Write-Host "  ✓ Module imported successfully" -ForegroundColor Green
         Write-Host "  ✓ Available commands: $($commands.Count)" -ForegroundColor Green
-        
+
         foreach ($cmd in $commands.Name) {
             Write-Host "    - $cmd" -ForegroundColor Gray
         }
-        
+
         return $true
-        
+
     } catch {
         Write-Error "Installation test failed: $($_.Exception.Message)"
         return $false
@@ -214,14 +214,14 @@ function Show-PostInstallInstructions {
 # Main installation logic
 try {
     Write-Banner
-    
+
     # Check PowerShell version
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         throw "PowerShell 5.1 or higher is required. Current version: $($PSVersionTable.PSVersion)"
     }
-    
+
     Write-Host "✅ PowerShell version check passed" -ForegroundColor Green
-    
+
     # Determine installation path
     if (-not $InstallPath) {
         if (Test-IsAdmin) {
@@ -231,9 +231,9 @@ try {
             $InstallPath = Join-Path $documentPath "WindowsPowerShell\Modules\CopilotAgent"
         }
     }
-    
+
     Write-Host "📂 Installation path: $InstallPath" -ForegroundColor Cyan
-    
+
     # Check if module already exists
     if ((Test-Path $InstallPath) -and -not $Force) {
         $response = Read-Host "Module already exists. Overwrite? (y/N)"
@@ -242,25 +242,25 @@ try {
             exit 0
         }
     }
-    
+
     # Install dependencies
     if (-not $SkipDependencies) {
         Install-RequiredModules
     }
-    
+
     # Copy module files
     Copy-ModuleFiles -DestinationPath $InstallPath
-    
+
     # Register module
     Register-Module -ModulePath $InstallPath
-    
+
     # Test installation
     if (Test-Installation) {
         Show-PostInstallInstructions
     } else {
         throw "Installation validation failed"
     }
-    
+
 } catch {
     Write-Error "Installation failed: $($_.Exception.Message)"
     exit 1

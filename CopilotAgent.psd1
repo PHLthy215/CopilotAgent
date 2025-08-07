@@ -5,14 +5,14 @@
     CompanyName = 'Open Source'
     Copyright = '(c) 2025. All rights reserved.'
     Description = 'PowerShell module for interactive Microsoft 365 Copilot integration with enterprise security, conversation management, and productivity insights.'
-    
+
     PowerShellVersion = '5.1'
-    
+
     # RequiredModules = @(
     #     'Microsoft.Graph.Authentication',
     #     'Microsoft.Graph.Applications'
     # )
-    
+
     FunctionsToExport = @(
         'Start-CopilotAgent',
         'Invoke-CopilotChat',
@@ -26,11 +26,11 @@
         'Export-CopilotDiagnostics',
         'Get-CopilotDiagnostics'
     )
-    
+
     CmdletsToExport = @()
     VariablesToExport = @()
     AliasesToExport = @()
-    
+
     PrivateData = @{
         PSData = @{
             Tags = @('Copilot', 'AI', 'Agent', 'Microsoft', 'Graph', 'Productivity', 'Automation', 'M365')

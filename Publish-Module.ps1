@@ -2,10 +2,10 @@
 param(
     [Parameter()]
     [string]$ApiKey,
-    
+
     [Parameter()]
     [switch]$WhatIf,
-    
+
     [Parameter()]
     [switch]$Force
 )
@@ -57,7 +57,7 @@ Write-Host "`n3. Running PSScriptAnalyzer..." -ForegroundColor Yellow
 
 if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
     $analysisResults = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Warning,Error
-    
+
     if ($analysisResults.Count -eq 0) {
         Write-Host "  ✓ No issues found" -ForegroundColor Green
     } else {
@@ -65,7 +65,7 @@ if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
         $analysisResults | ForEach-Object {
             Write-Host "    $($_.Severity): $($_.Message) ($($_.ScriptName):$($_.Line))" -ForegroundColor Gray
         }
-        
+
         if (-not $Force) {
             $continue = Read-Host "Continue with publication? (y/N)"
             if ($continue -ne 'y' -and $continue -ne 'Y') {
@@ -85,14 +85,14 @@ if ((Get-Module -ListAvailable -Name Pester) -and (Test-Path 'Tests')) {
         $config = New-PesterConfiguration
         $config.Run.Path = './Tests'
         $config.Output.Verbosity = 'Minimal'
-        
+
         $testResults = Invoke-Pester -Configuration $config
-        
+
         if ($testResults.FailedCount -eq 0) {
             Write-Host "  ✓ All tests passed ($($testResults.PassedCount) tests)" -ForegroundColor Green
         } else {
             Write-Host "  ❌ $($testResults.FailedCount) tests failed" -ForegroundColor Red
-            
+
             if (-not $Force) {
                 throw "Publication cancelled due to test failures"
             }
@@ -117,7 +117,7 @@ if (-not $ApiKey) {
 if (-not $ApiKey) {
     Write-Host "  ⚠️  No API key provided" -ForegroundColor Yellow
     Write-Host "    Set via -ApiKey parameter or PSGALLERY_API_KEY environment variable" -ForegroundColor Gray
-    
+
     if ($WhatIf) {
         Write-Host "  ✓ WhatIf mode - skipping API key validation" -ForegroundColor Green
     } else {
@@ -147,7 +147,7 @@ if ($WhatIf) {
 } else {
     # Actual publication
     Write-Host "`n7. Publishing to PowerShell Gallery..." -ForegroundColor Yellow
-    
+
     try {
         $publishParams = @{
             Path = '.'
@@ -155,20 +155,20 @@ if ($WhatIf) {
             NuGetApiKey = $ApiKey
             Verbose = $true
         }
-        
+
         if ($Force) {
             $publishParams.Force = $true
         }
-        
+
         Publish-Module @publishParams
-        
+
         Write-Host "`n🎉 Successfully published CopilotAgent v$($manifest.Version) to PowerShell Gallery!" -ForegroundColor Green
         Write-Host "`nModule will be available at:" -ForegroundColor Cyan
         Write-Host "https://www.powershellgallery.com/packages/CopilotAgent/$($manifest.Version)" -ForegroundColor Blue
-        
+
         Write-Host "`nUsers can install with:" -ForegroundColor Cyan
         Write-Host "Install-Module -Name CopilotAgent" -ForegroundColor Yellow
-        
+
     } catch {
         Write-Error "Publication failed: $($_.Exception.Message)"
         throw

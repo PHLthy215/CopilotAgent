@@ -7,7 +7,7 @@ $requiredFiles = @(
     "CopilotAgent.psd1",
     "CopilotAgent.psm1",
     "Private\CopilotApiClient.ps1",
-    "Private\ConversationManager.ps1", 
+    "Private\ConversationManager.ps1",
     "Public\Start-CopilotAgent.ps1",
     "Public\Invoke-CopilotChat.ps1",
     "Public\Get-CopilotInsights.ps1",
@@ -51,7 +51,7 @@ Get-ChildItem -Path "Private\*.ps1", "Public\*.ps1" -Recurse | ForEach-Object {
         $tokens = $null
         $errors = $null
         [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$tokens, [ref]$errors)
-        
+
         if ($errors.Count -eq 0) {
             Write-Host "  ✓ $($_.Name)" -ForegroundColor Green
         } else {
@@ -99,7 +99,7 @@ Write-Host "To test manually: Import-Module .\CopilotAgent.psd1 -Force" -Foregro
 # Test 5: Show module capabilities
 Write-Host "`n📋 Module Capabilities:" -ForegroundColor Cyan
 Write-Host "- Interactive AI chat interface" -ForegroundColor White
-Write-Host "- Microsoft 365 Copilot integration" -ForegroundColor White  
+Write-Host "- Microsoft 365 Copilot integration" -ForegroundColor White
 Write-Host "- Conversation management and export" -ForegroundColor White
 Write-Host "- Configurable API settings" -ForegroundColor White
 Write-Host "- Insights from emails, calendar, and documents" -ForegroundColor White

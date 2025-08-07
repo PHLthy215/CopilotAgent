@@ -3,7 +3,7 @@ Write-Host "Testing CopilotAgent Module Files..." -ForegroundColor Cyan
 # Check if main files exist
 $files = @(
     "CopilotAgent.psd1",
-    "CopilotAgent.psm1", 
+    "CopilotAgent.psm1",
     "README.md"
 )
 
