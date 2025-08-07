@@ -24,20 +24,16 @@ if (-not $Script:CopilotConfig) {
     }
 }
 
-# Export public functions
+# Export all required functions in a single call
 $PublicFunctions = Get-ChildItem -Path "$PSScriptRoot\Public\*.ps1" | ForEach-Object { $_.BaseName }
-Export-ModuleMember -Function $PublicFunctions
 
-# Export telemetry functions from private module
-Export-ModuleMember -Function @(
+$AllFunctions = $PublicFunctions + @(
     'Enable-CopilotTelemetry',
     'Disable-CopilotTelemetry',
     'Get-CopilotTelemetryStatus',
-    'Get-CopilotUsageReport'
-)
-
-# Export diagnostic functions from private module
-Export-ModuleMember -Function @(
+    'Get-CopilotUsageReport',
     'Export-CopilotDiagnostics',
     'Get-CopilotDiagnostics'
 )
+
+Export-ModuleMember -Function $AllFunctions

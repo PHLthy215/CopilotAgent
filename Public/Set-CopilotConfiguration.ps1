@@ -64,6 +64,13 @@ function Set-CopilotConfiguration {
 
     switch ($PSCmdlet.ParameterSetName) {
         'Show' {
+            # Ensure config has default values
+            if (-not $Script:CopilotConfig.TimeoutSeconds) { $Script:CopilotConfig.TimeoutSeconds = 30 }
+            if (-not $Script:CopilotConfig.MaxRetries) { $Script:CopilotConfig.MaxRetries = 3 }
+            if (-not $Script:CopilotConfig.GraphEndpoint) { $Script:CopilotConfig.GraphEndpoint = "https://graph.microsoft.com/v1.0" }
+            if (-not $Script:CopilotConfig.CopilotEndpoint) { $Script:CopilotConfig.CopilotEndpoint = "https://graph.microsoft.com/v1.0/copilot" }
+            if (-not $Script:CopilotConfig.ConversationHistory) { $Script:CopilotConfig.ConversationHistory = @() }
+            
             Write-Host "📋 Current Copilot Agent Configuration:" -ForegroundColor Cyan
             Write-Host ""
             Write-Host "API Settings:" -ForegroundColor Yellow
@@ -83,7 +90,8 @@ function Set-CopilotConfiguration {
                 Write-Host ""
                 Write-Host "Custom Settings:" -ForegroundColor Yellow
                 foreach ($key in $customKeys) {
-                    Write-Host "  ${key}:$((' ' * (15 - $key.Length)))$($Script:CopilotConfig[$key])" -ForegroundColor White
+                    $spaces = [Math]::Max(0, 15 - $key.Length)
+                    Write-Host "  ${key}:$(' ' * $spaces)$($Script:CopilotConfig[$key])" -ForegroundColor White
                 }
             }
             return

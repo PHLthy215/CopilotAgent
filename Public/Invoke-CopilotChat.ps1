@@ -46,12 +46,17 @@ function Invoke-CopilotChat {
 
         [Parameter()]
         [ValidateNotNull()]
-        [hashtable]$AdditionalParameters = @{}
+        [hashtable]$AdditionalParameters = @{},
+
+        [Parameter()]
+        [switch]$SkipPreconditionChecks
     )
 
     begin {
-        # Validate preconditions
-        Test-CopilotPreconditions -RequireAuthentication -RequireInternet
+        # Validate preconditions unless skipped
+        if (-not $SkipPreconditionChecks) {
+            Test-CopilotPreconditions -RequireAuthentication -RequireInternet
+        }
 
         # Create conversation if not provided
         if (-not $Conversation) {
