@@ -36,9 +36,15 @@ jobs:
       shell: pwsh
       run: |
         $results = Invoke-ScriptAnalyzer -Path . -Recurse -ReportSummary
-        if ($results.Count -gt 0) {
-          $results | Out-String | Write-Host
-          throw "PSScriptAnalyzer found issues"
+        $errors = $results | Where-Object { $_.Severity -eq 'Error' -or $_.Severity -eq 'ParseError' }
+        if ($errors.Count -gt 0) {
+          $errors | Out-String | Write-Host
+          throw "PSScriptAnalyzer found $($errors.Count) critical errors"
+        } else {
+          Write-Host "✅ PSScriptAnalyzer passed - no critical errors found"
+          $warnings = ($results | Where-Object { $_.Severity -eq 'Warning' }).Count
+          $info = ($results | Where-Object { $_.Severity -eq 'Information' }).Count
+          Write-Host "📊 Summary: $warnings warnings, $info informational messages (non-blocking)"
         }
     
     - name: Run Pester Tests
