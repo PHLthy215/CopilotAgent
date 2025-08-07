@@ -1,0 +1,77 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        powershell-version: ['5.1', '7.x']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PowerShell ${{ matrix.powershell-version }}
+      uses: actions/setup-powershell@v1
+      with:
+        powershell-version: ${{ matrix.powershell-version }}
+    
+    - name: Install Dependencies
+      shell: pwsh
+      run: |
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+        Install-Module -Name Pester -Force -SkipPublisherCheck
+        Install-Module -Name PSScriptAnalyzer -Force
+        Install-Module -Name Microsoft.Graph.Authentication -Force
+    
+    - name: Run PSScriptAnalyzer
+      shell: pwsh
+      run: |
+        $results = Invoke-ScriptAnalyzer -Path . -Recurse -ReportSummary
+        if ($results.Count -gt 0) {
+          $results | Out-String | Write-Host
+          throw "PSScriptAnalyzer found issues"
+        }
+    
+    - name: Run Pester Tests
+      shell: pwsh
+      run: |
+        $config = New-PesterConfiguration
+        $config.Run.Path = './Tests'
+        $config.TestResult.Enabled = $true
+        $config.TestResult.OutputPath = 'testResults.xml'
+        $config.CodeCoverage.Enabled = $true
+        $config.CodeCoverage.Path = './Public/*.ps1', './Private/*.ps1'
+        Invoke-Pester -Configuration $config
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.powershell-version }}
+        path: testResults.xml
+
+  publish:
+    needs: test
+    runs-on: windows-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PowerShell
+      uses: actions/setup-powershell@v1
+    
+    - name: Publish to PowerShell Gallery
+      shell: pwsh
+      env:
+        PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+      run: |
+        Publish-Module -Path . -Repository PSGallery -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose

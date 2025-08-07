@@ -1,0 +1,116 @@
+# PowerShell Module Artifacts
+*.exe
+*.dll
+*.pdb
+*.tmp
+
+# Logs and diagnostics
+*.log
+logs/
+diagnostics/
+CopilotAgent_Diagnostics_*.json
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+.vscode/
+.idea/
+
+# Authentication and sensitive data
+*.pfx
+*.p12
+config.json
+secrets.json
+tokens/
+credentials/
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Build outputs
+build/
+dist/
+publish/
+*.nupkg
+*.zip
+
+# Temporary files
+temp/
+tmp/
+.temp/
+*~
+*.swp
+*.bak
+*.orig
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Local development
+local/
+sandbox/
+scratch/
+test-data/
+
+# Conversation exports (user data)
+conversations/
+exports/
+*.conversation.json
+*.conversation.html
+*.conversation.md
+
+# Node modules (if any)
+node_modules/
+
+# Python (if any)
+__pycache__/
+*.pyc
+
+# JetBrains
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Configuration overrides
+config.override.json
+appsettings.local.json
+
+# Certificates and keys
+*.cer
+*.crt
+*.key
+*.pem
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Package manager files
+package-lock.json
+yarn.lock
+
+# Documentation build
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# PowerShell profile additions
+profile.ps1
+Microsoft.PowerShell_profile.ps1
