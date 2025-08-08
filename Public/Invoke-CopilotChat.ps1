@@ -71,7 +71,7 @@ function Invoke-CopilotChat {
             Write-Host "🤖 Sending message to Copilot..." -ForegroundColor Cyan
 
             # Add user message to conversation
-            $Conversation.AddMessage("user", $Message)
+            $Conversation.AddMessage("user", $Message, @{})
 
             # Prepare the request body
             $requestBody = @{
