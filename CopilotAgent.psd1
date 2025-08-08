@@ -1,4 +1,5 @@
 @{
+    RootModule = 'CopilotAgent.psm1'
     ModuleVersion = '1.0.0'
     GUID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
     Author = 'CopilotAgent Contributors'
@@ -19,6 +20,7 @@
         'Get-CopilotInsights',
         'Set-CopilotConfiguration',
         'Export-CopilotConversation',
+        'New-CopilotConversation',
         'Enable-CopilotTelemetry',
         'Disable-CopilotTelemetry',
         'Get-CopilotTelemetryStatus',

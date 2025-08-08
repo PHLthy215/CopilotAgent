@@ -1,14 +1,23 @@
+$script:OriginalPSModulePath = $env:PSModulePath
+
 BeforeAll {
-    # Import the module for testing
-    $ModuleRoot = Split-Path -Parent $PSScriptRoot
-    Import-Module "$ModuleRoot\CopilotAgent.psd1" -Force
+    # Get the parent directory of the module's root, and add it to the PSModulePath
+    $ModuleParentDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+    $env:PSModulePath = "$ModuleParentDir$([System.IO.Path]::PathSeparator)$($env:PSModulePath)"
+    Import-Module "$PSScriptRoot\..\CopilotAgent.psd1" -Force
+}
+
+AfterAll {
+    # Restore the original PSModulePath and remove the module
+    $env:PSModulePath = $script:OriginalPSModulePath
+    Remove-Module CopilotAgent -Force -ErrorAction SilentlyContinue
 }
 
 Describe "CopilotAgent Module Tests" {
 
     Context "Module Loading" {
         It "Should import the module without errors" {
-            { Import-Module CopilotAgent -Force } | Should -Not -Throw
+            Get-Module -Name 'CopilotAgent' | Should -Not -BeNull
         }
 
         It "Should export the expected functions" {
@@ -30,24 +39,24 @@ Describe "CopilotAgent Module Tests" {
 
     Context "Module Manifest" {
         It "Should have a valid module manifest" {
-            $manifest = Test-ModuleManifest -Path "$ModuleRoot\CopilotAgent.psd1"
+            $manifest = Test-ModuleManifest -Path "$ModuleRoot/CopilotAgent.psd1"
             $manifest | Should -Not -BeNullOrEmpty
         }
 
         It "Should have correct module version format" {
-            $manifest = Test-ModuleManifest -Path "$ModuleRoot\CopilotAgent.psd1"
+            $manifest = Test-ModuleManifest -Path "$ModuleRoot/CopilotAgent.psd1"
             $manifest.Version | Should -Match '^\d+\.\d+\.\d+$'
         }
 
         It "Should have required metadata" {
-            $manifest = Test-ModuleManifest -Path "$ModuleRoot\CopilotAgent.psd1"
+            $manifest = Test-ModuleManifest -Path "$ModuleRoot/CopilotAgent.psd1"
             $manifest.Author | Should -Not -BeNullOrEmpty
             $manifest.Description | Should -Not -BeNullOrEmpty
             $manifest.GUID | Should -Not -BeNullOrEmpty
         }
 
         It "Should specify minimum PowerShell version" {
-            $manifest = Test-ModuleManifest -Path "$ModuleRoot\CopilotAgent.psd1"
+            $manifest = Test-ModuleManifest -Path "$ModuleRoot/CopilotAgent.psd1"
             $manifest.PowerShellVersion | Should -Not -BeNullOrEmpty
             [Version]$manifest.PowerShellVersion | Should -BeGreaterThan ([Version]'5.0')
         }
@@ -76,7 +85,7 @@ Describe "Conversation Management Tests" {
     Context "Conversation Class" {
         BeforeAll {
             # Load the conversation manager
-            . "$ModuleRoot\Private\ConversationManager.ps1"
+            . "$ModuleRoot/Private/ConversationManager.ps1"
         }
 
         It "Should create new conversation" {
@@ -85,7 +94,7 @@ Describe "Conversation Management Tests" {
 
         It "Should add messages to conversation" {
             $conv = New-CopilotConversation
-            { $conv.AddMessage("user", "test message") } | Should -Not -Throw
+            { $conv.AddMessage("user", "test message", @{}) } | Should -Not -Throw
             $conv.GetMessages().Count | Should -Be 2  # System + user message
         }
 
@@ -102,10 +111,10 @@ Describe "Export Functionality Tests" {
     Context "Export-CopilotConversation" {
         BeforeAll {
             # Create a test conversation
-            . "$ModuleRoot\Private\ConversationManager.ps1"
+            . "$ModuleRoot/Private/ConversationManager.ps1"
             $testConv = New-CopilotConversation
-            $testConv.AddMessage("user", "Hello")
-            $testConv.AddMessage("assistant", "Hi there!")
+            $testConv.AddMessage("user", "Hello", @{})
+            $testConv.AddMessage("assistant", "Hi there!", @{})
         }
 
         It "Should export to JSON format" {
@@ -186,6 +195,11 @@ Describe "Insights Tests" {
 Describe "Chat Functionality Tests" {
 
     Context "Invoke-CopilotChat" {
+        BeforeAll {
+            # Mock the precondition check to avoid network calls
+            Mock -CommandName 'Test-CopilotPreconditions' -MockWith { return $true }
+        }
+
         It "Should accept message parameter" {
             { Invoke-CopilotChat -Message "Hello" } | Should -Not -Throw
         }

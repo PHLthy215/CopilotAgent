@@ -83,7 +83,9 @@ function Set-CopilotConfiguration {
                 Write-Host ""
                 Write-Host "Custom Settings:" -ForegroundColor Yellow
                 foreach ($key in $customKeys) {
-                    Write-Host "  ${key}:$((' ' * (15 - $key.Length)))$($Script:CopilotConfig[$key])" -ForegroundColor White
+                    $padding = 15 - $key.Length
+                    if ($padding -lt 1) { $padding = 1 }
+                    Write-Host "  ${key}:$((' ' * $padding))$($Script:CopilotConfig[$key])" -ForegroundColor White
                 }
             }
             return
@@ -151,7 +153,7 @@ function Set-CopilotConfiguration {
             }
 
             if ($TimeoutSeconds) {
-                $Script:CopilotConfig.TimeoutSeconds = $TimeoutSeconds
+                $Script:CopilotConfig.Timeout = $TimeoutSeconds
                 $updated += "Timeout"
                 Write-Host "  ✓ Timeout: $TimeoutSeconds seconds" -ForegroundColor Green
             }

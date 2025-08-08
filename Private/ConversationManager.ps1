@@ -51,7 +51,7 @@ function New-CopilotConversation {
 
     # Add system message
     $systemMessage = "You are a helpful AI assistant integrated with Microsoft 365 Copilot. You can help with various tasks including document analysis, meeting insights, and general productivity."
-    $conversation.AddMessage("system", $systemMessage)
+    $conversation.AddMessage("system", $systemMessage, @{})
 
     return $conversation
 }

@@ -314,11 +314,11 @@ function Get-CopilotTelemetryStatus {
 }
 
 # Initialize telemetry system
-if (-not $Script:CopilotConfig.ContainsKey('EnableTelemetry')) {
-    # Default to DISABLED - require explicit opt-in for privacy
+if ($Script:CopilotConfig -and -not $Script:CopilotConfig.ContainsKey('EnableTelemetry')) {
+    # Default to DISABLED - require explicit opt-in for privacy  
     $Script:CopilotConfig.EnableTelemetry = $false
-    $Script:CopilotConfig.SessionStart = Get-Date
-    $Script:CopilotConfig.SessionId = [Guid]::NewGuid().ToString()
+}
+if ($Script:CopilotConfig -and -not $Script:CopilotConfig.ContainsKey('TelemetryEndpoint')) {
     # Remove hardcoded endpoint - make configurable or disable
     $Script:CopilotConfig.TelemetryEndpoint = $null
 }

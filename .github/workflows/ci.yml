@@ -47,9 +47,34 @@ jobs:
           Write-Host "📊 Summary: $warnings warnings, $info informational messages (non-blocking)"
         }
     
+    - name: Prepare Module Structure
+      shell: pwsh
+      run: |
+        # Create module directory structure for testing
+        Write-Host "Setting up module for testing..."
+        Write-Host "Current directory: $PWD"
+        Get-ChildItem . | Format-Table Name, Mode, Length
+        
+        # The module files are already in the correct structure
+        # Just add current directory to PSModulePath for testing
+        $env:PSModulePath = "$PWD;$env:PSModulePath"
+        Write-Host "PSModulePath: $env:PSModulePath"
+        
+        # Test module import directly from current directory
+        Import-Module ./CopilotAgent.psd1 -Force
+        Get-Module CopilotAgent | Format-List
+        
+        # List available functions
+        Write-Host "Available functions:"
+        Get-Command -Module CopilotAgent | Format-Table Name, CommandType
+    
     - name: Run Pester Tests
       shell: pwsh
       run: |
+        # Ensure module is available for tests
+        $env:PSModulePath = "$PWD;$env:PSModulePath"
+        Import-Module ./CopilotAgent.psd1 -Force
+        
         $config = New-PesterConfiguration
         $config.Run.Path = './Tests'
         $config.TestResult.Enabled = $true
