@@ -20,6 +20,7 @@
         'Get-CopilotInsights',
         'Set-CopilotConfiguration',
         'Export-CopilotConversation',
+        'New-CopilotConversation',
         'Enable-CopilotTelemetry',
         'Disable-CopilotTelemetry',
         'Get-CopilotTelemetryStatus',

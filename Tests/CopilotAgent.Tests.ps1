@@ -4,7 +4,7 @@ BeforeAll {
     # Get the parent directory of the module's root, and add it to the PSModulePath
     $ModuleParentDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
     $env:PSModulePath = "$ModuleParentDir$([System.IO.Path]::PathSeparator)$($env:PSModulePath)"
-    Import-Module CopilotAgent -Force
+    Import-Module "$PSScriptRoot\..\CopilotAgent.psd1" -Force
 }
 
 AfterAll {
